@@ -4,17 +4,23 @@ import { useDfa } from "../layouts/DfaContext";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { setDfaData } = useDfa();
+  // 1. Pull in dfaData alongside setDfaData
+  const { dfaData, setDfaData } = useDfa();
 
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  // 2. If dfaData exists, load its nodes and edges, otherwise start empty!
+  const [nodes, setNodes] = useState(dfaData ? dfaData.nodes : []);
+  const [edges, setEdges] = useState(dfaData ? dfaData.edges : []);
 
-  // Interaction modes: 'select', 'addTransition', 'setInitial', 'toggleFinal'
+  // Interaction modes...
   const [mode, setMode] = useState("select");
   const [selectedSource, setSelectedSource] = useState(null);
+
+  // Selection states for dragging and deletion
   const [draggingNode, setDraggingNode] = useState(null);
-  const [savedDfa, setSavedDfa] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
+
+  // 3. Keep the table visible if it was already saved
+  const [savedDfa, setSavedDfa] = useState(dfaData || null);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -323,10 +329,11 @@ export default function HomePage() {
     <div className="min-h-screen bg-slate-50 p-6 font-sans text-slate-800">
       <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-6 border border-slate-200">
         <h1 className="text-2xl font-extrabold text-slate-900 mb-2">
-          1. Draw DFA
+          Draw Deterministic Finite Automata
         </h1>
         <p className="text-sm text-slate-500 mb-6">
-          Add states, connect them with inputs, and set the initial state.
+          Add states, connect them with inputs, set the initial state and final
+          state.
         </p>
 
         {/* Toolbar */}
