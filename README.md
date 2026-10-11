@@ -1,16 +1,43 @@
-# React + Vite
+# 🧮 Finite State Automata Simulator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Live Demo:** [https://kkroffl.github.io/Mealy-Moore/]
 
-Currently, two official plugins are available:
+A mathematically rigorous, interactive web application built to visualize Deterministic Finite Automata (DFA) and automatically convert them into equivalent **Mealy** and **Moore** machines. Designed as an educational tool for Theory of Computation and Automata theory presentations, it features dynamic SVG graph rendering and real-time transition matrix generation.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Key Features
 
-## React Compiler
+- **Interactive Graph Builder:** Draw states, define transitions, and toggle initial/final states using an intuitive click-and-point interface.
+- **Dynamic SVG Rendering:** Automatically calculates node geometry, self-loops, and reciprocal edge curves to generate clean, readable automata diagrams.
+- **Global State Persistence:** Built with React Context API to ensure your drawn DFA is preserved seamlessly as you navigate between conversion pages.
+- **Formal Mealy Conversion:** Mathematically binds outputs to transition edges based on the destination state's accepting status.
+- **Formal Moore Conversion:** Dynamically generates input fields based on the exact number of states drawn, binding outputs directly to the states.
+- **Automated Formal Definitions:** Instantly generates the standard 5-tuple for DFAs and the 6-tuple ($Q, \Sigma, \Delta, \delta, \lambda, q_0$) for converted machines, alongside their complete transition matrices.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠️ Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework:** React JS
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS (for modern, responsive, utility-first UI)
+- **Routing:** React Router v6 (`HashRouter` implemented for static host compatibility)
+- **State Management:** React Context API (`DfaProvider`)
+- **Deployment:** GitHub Pages (`gh-pages`)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Local Installation
+
+1. **Clone the repository:**
+   git clone [https://github.com/kkroffl/Mealy-Moore.git]
+   cd Mealy-Moore
+
+2. **Install dependencies:**
+   npm install
+
+3. **Start the development server:**
+   npm run dev
+   Open http://localhost:5173/Mealy-Moore/ in your browser.
+
+## 📖 How to Use
+
+1. **Build a DFA:** Use the Home Page builder to add states ($q_0, q_1$, etc.). Click **Add Transition** to link them with inputs (e.g., `0` or `1`).
+2. **Define State Status:** Select a state and use the **Set Initial** or **Toggle Final** buttons to define the machine's entry and exit points.
+3. **Save:** Click **Save & Generate Table** to lock the DFA into the global context and view its transition matrix.
+4. **Convert:** Navigate to the **Mealy** or **Moore** pages. Input your desired formal outputs ($\Delta$) to instantly generate the equivalent mathematical models and SVG diagrams.
