@@ -6,16 +6,11 @@ export default function MoorePage() {
   const navigate = useNavigate();
   const { dfaData } = useDfa();
 
-  // Initialize state directly to avoid cascading renders
-  const [stateOutputs, setStateOutputs] = useState(() => {
-    if (!dfaData) return {};
-    const initialOutputs = {};
-    dfaData.states.forEach((st) => {
-      initialOutputs[st] = dfaData.finalStates.includes(st) ? "1" : "0";
-    });
-    return initialOutputs;
-  });
+  // Dynamic array of outputs (Defaults to Non-Final and Final)
+  const [dynamicOutputs, setDynamicOutputs] = useState(["N", "Y"]);
 
+  // Stores the final mapped outputs for the table/SVG
+  const [stateOutputs, setStateOutputs] = useState({});
   const [isConverted, setIsConverted] = useState(false);
 
   if (!dfaData) {
@@ -39,19 +34,24 @@ export default function MoorePage() {
     );
   }
 
-  const handleOutputChange = (stateId, value) => {
-    setStateOutputs((prev) => ({ ...prev, [stateId]: value }));
-  };
-
   const handleGenerate = () => {
-    // Ensure no outputs are left blank
-    const hasEmpty = Object.values(stateOutputs).some(
-      (val) => val.trim() === "",
-    );
+    // Ensure no output boxes are left blank
+    const hasEmpty = dynamicOutputs.some((val) => val.trim() === "");
     if (hasEmpty) {
-      return alert("Please provide an output for every state.");
+      return alert("Please provide a value for all output boxes.");
     }
-    setIsConverted(true);
+
+    if (dfaData) {
+      const autoOutputs = {};
+      dfaData.states.forEach((st) => {
+        // Automatically map output 1 to Non-Final and output 2 to Final
+        autoOutputs[st] = dfaData.finalStates.includes(st)
+          ? dynamicOutputs[1] || dynamicOutputs[0] || ""
+          : dynamicOutputs[0] || "";
+      });
+      setStateOutputs(autoOutputs);
+      setIsConverted(true);
+    }
   };
 
   // Get unique output alphabet (Δ) to display in the 6-tuple
@@ -233,7 +233,7 @@ export default function MoorePage() {
               Moore Machine Conversion
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Bind specific outputs to every individual state.
+              Outputs are strictly bound to individual states.
             </p>
           </div>
           <button
@@ -247,28 +247,67 @@ export default function MoorePage() {
         {!isConverted ? (
           <div className="py-10 px-6 bg-indigo-50 border border-indigo-100 rounded-xl shadow-inner max-w-2xl mx-auto text-center">
             <h3 className="text-lg font-bold text-indigo-900 mb-2">
-              Define Output for Each State (Δ)
+              Define Output Alphabet (Δ)
             </h3>
             <p className="mb-6 text-indigo-700 text-sm">
-              Assign the exact output produced when the machine enters each
-              state.
+              We will automatically map these to your Final and Non-Final
+              states.
             </p>
 
-            <div className="flex flex-col gap-3 max-w-sm mx-auto mb-8">
-              {dfaData.states.map((st) => (
-                <div key={st} className="flex items-center gap-3">
-                  <label className="font-bold text-indigo-800 text-sm w-20 text-right">
-                    State {st}:
-                  </label>
-                  <input
-                    type="text"
-                    value={stateOutputs[st] || ""}
-                    onChange={(e) => handleOutputChange(st, e.target.value)}
-                    className="flex-1 px-4 py-2 rounded-lg border border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-center shadow-sm"
-                    placeholder="e.g. A, 0, or 1"
-                  />
-                </div>
-              ))}
+            <div className="bg-white p-6 rounded-xl border border-indigo-100 mb-8 max-w-sm mx-auto shadow-sm">
+              <div className="flex justify-between items-center mb-5">
+                <h4 className="font-bold text-slate-700 text-sm">
+                  Output Symbols
+                </h4>
+                <button
+                  onClick={() => setDynamicOutputs([...dynamicOutputs, ""])}
+                  className="text-xs font-bold bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded hover:bg-indigo-200 transition"
+                >
+                  + Add Output
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {dynamicOutputs.map((out, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between gap-4"
+                  >
+                    <span className="font-semibold text-slate-600 text-sm text-left flex-1">
+                      {index === 0
+                        ? "Non-Final States:"
+                        : index === 1
+                          ? "Final States:"
+                          : `Extra Output ${index + 1}:`}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        maxLength="1"
+                        value={out}
+                        onChange={(e) => {
+                          const newOuts = [...dynamicOutputs];
+                          newOuts[index] = e.target.value.toUpperCase();
+                          setDynamicOutputs(newOuts);
+                        }}
+                        className="w-16 text-center border-2 border-indigo-200 rounded-lg p-2 font-bold text-indigo-800 focus:border-indigo-500 focus:outline-none shadow-sm"
+                      />
+                      {dynamicOutputs.length > 2 && (
+                        <button
+                          onClick={() =>
+                            setDynamicOutputs(
+                              dynamicOutputs.filter((_, i) => i !== index),
+                            )
+                          }
+                          className="text-red-400 hover:bg-red-50 hover:text-red-600 p-1.5 rounded font-bold transition"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <button
